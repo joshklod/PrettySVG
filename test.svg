@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Here's a > comment "--><!--"-->
+<svg
+   version = "1.1"
+   width   = "400"
+   height  = "400"
+
+   fake="very &lt;annoying> attr with     spaces	and symbols"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xml:space="preserve"
+   id=	'root'    
+   xmlns="http://www.w3.org/2000/svg"
+
+   >
+  <title>Test SVG</title>
+  <desc>This SVG is used to test 'svgn'</desc>
+  <metadata><a>One liner</a><desc /><a>
+    Multi
+    liner
+  </a></metadata>
+  <text x="100" id="text1" y="100">One <tspan font-weight="bold">line</tspan> text</text>
+
+	Random
+	  extra   
+	    
+	text
+
+  <g/>Random
+      extra
+
+    text
+  <g/>
+
+Random
+  extra
+
+text
+
+  <rect x="300" id="rect1"	width="50" fill="blue" height="50" y="150"/>
+
+  <g id='group1'>
+  <text></text>
+            <!-- Inside
+                 multi line
+                 comment -->
+            <circle /><text x="100" y="200">
+Multi
+	<tspan dy="5" fill="#0000FF">line</tspan>
+<![CDATA[This should be <plain text>]]>
+</text> <rect id="empty"	/>
+  </g>
+</svg>
+
+<!-- vim: set sw=2 et: -->
