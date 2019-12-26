@@ -194,6 +194,7 @@ sub format_tag {
 	return $tag;
 }
 
+my $color = 0;
 sub process_tag {
 	my $type;
 
@@ -212,6 +213,9 @@ sub process_tag {
 		$tag =~ s/\s*>$/>/;
 		$level-- unless ($level == 0);
 	}
+
+	$tag = "\e[" . ($color + ($color < 6 ? 31 : 85)) . "m$tag\e[0m";
+	if (++$color > 11) { $color = 0; }
 
 	unless ($in_text) { $tag = ($indent x $level) . $tag; }
 
