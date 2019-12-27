@@ -84,7 +84,14 @@ sub find_tag {
 sub parse_tag {
 	my $tag = '';
 
-	if (0) {
+	if      ($tag = getmatch('<!--')) {
+		$tag .= find_match('-->');
+	} elsif ($tag = getmatch('<?')) {
+		$tag .= find_match('?>');
+	} elsif ($tag = getmatch('<![CDATA[')) {
+		$tag .= find_match(']]>');
+	} elsif ($tag = getmatch('</')) {
+		$tag .= find_match('>');
 	} else {
 		$tag .= find_match('>', 1);
 	}
