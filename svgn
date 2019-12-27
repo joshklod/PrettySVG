@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+
+my $match_string   = qr/'[^']*'|"[^"]*"/;
+
+{
+	my ($line, @chars);
+	my $idx    = 0;
+
+	sub getline {
+		if ($idx > $#chars) {
+			$line = <>;
+			unless ($line) { $line = ""; }
+			@chars  = split(//, $line);
+			$idx    = 0;
+		}
+	}
+
+	sub nextchar {
+		my ($c) = @_;
+
+		getline();
+
+		if ($#chars == -1) {
+			return 0;
+		} elsif (length $c) {
+			return ($chars[$idx] eq $c);
+		} else {
+			return 1;
+		}
+	}
+
+	sub getmatch {
+		my ($regex) = @_;
+		unless (ref $regex eq 'Regexp') {
+			$regex = qr/\Q$regex\E/;
+		}
+
+		getline();
+
+		my ($match) = substr($line, $idx) =~ /^($regex)/;
+		if ($match) {
+			$idx += length($match);
+		} else {
+			$match = '';
+		}
+
+		return $match;
+	}
+
+	sub find_match {
+		my ($regex, $skip_str) = @_;
+		unless (defined $skip_str) { $skip_str = 0; }
+		unless (ref $regex eq 'Regexp') {
+			$regex = qr/\Q$regex\E/;
+		}
+		my $match;
+
+		my $dot = $skip_str ? qr/(?>$match_string|.)/ : qr/./;
+
+		my $result = '';
+		while (nextchar()) {
+			if ($match = getmatch(qr/$dot*?$regex/)) {
+				$result .= $match;
+				last;
+			} else {
+				$result .= getmatch(qr/.*/s);
+			}
+		}
+		return $result;
+	}
+}
+
+sub find_tag {
+	while (nextchar() && !nextchar('<')) {
+		print getmatch(qr/[^<]*/);
+	}
+	return nextchar('<');
+}
+
+sub parse_tag {
+	my $tag = '';
+
+	if (0) {
+	} else {
+		$tag .= find_match('>', 1);
+	}
+
+	print $tag;
+}
+
+while (nextchar()) {
+	find_tag() and parse_tag();
+}
