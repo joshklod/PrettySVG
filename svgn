@@ -83,6 +83,26 @@ my $in_text   = 0;
 	}
 }
 
+sub attr_sort {
+	sub priority {
+		my ($attr) = @_;
+		my @order = ('id', qr/^xmlns(?:\:.*)?$/, 'x', 'y', 'width', 'height');
+
+		my ($name) = $attr =~ /^([^=]*)/;
+
+		for (my $idx = 0; $idx <= $#order; $idx++) {
+			my $pat = $order[$idx];
+			if (ref $pat eq 'Regexp' ? $name =~ $pat : $name eq $pat) {
+				return $idx;
+			}
+		}
+		return $#order + 1;
+	}
+
+	# Fall back to alphabetical sort if priority is equal
+	return ((priority($a) <=> priority($b)) or ($a cmp $b));
+}
+
 sub find_tag {
 	my $text = '';
 	while (nextchar() && !nextchar('<')) {
@@ -136,7 +156,7 @@ sub parse_tag {
 		while ($tag =~ s/\s+(\S*)\s*=\s*($match_string|\S*)//) {
 			push(@attrs, "$1=$2");
 		}
-		@attrs = sort @attrs;
+		@attrs = sort attr_sort @attrs;
 
 		$tag = join("\n".($indent x $level).$indent_attr,
 				($tag, @attrs, $end));
