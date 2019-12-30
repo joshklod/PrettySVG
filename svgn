@@ -95,7 +95,7 @@ sub parse_tag {
 		$tag =~ s/\s*>$/>/;
 	} else {
 		$tag .= find_match('>', 1);
-		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/ $1=$2/g;
+		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/\n   $1=$2/g;
 		if ($tag =~ m{/>$}) {
 			$tag =~ s{\s*/>$}{ />};
 		} else {
