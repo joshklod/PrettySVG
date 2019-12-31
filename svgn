@@ -6,6 +6,11 @@ use autodie;
 
 my $match_string   = qr/'[^']*'|"[^"]*"/;
 
+my $indent        = 2;
+
+if ($indent        =~ /^\d+$/) { $indent        = ' ' x $indent; }
+
+my $level     = 0;
 my $in_text   = 0;
 
 {
@@ -86,6 +91,11 @@ sub find_tag {
 		if ($text =~ /\S/) {
 			$text =~ s/^\s*\n|\s+$//g; # Strip leading/trailing blank lines
 			$text =~ s/[[:blank:]]+$//mg;
+
+			# Use indent of first line as reference
+			my ($old_indent) = $text =~ /^(\s*)/;
+			$text =~ s/^\Q$old_indent\E/$indent x $level/emg;
+
 			$text .= "\n";
 		} else {
 			$text = '';
@@ -97,7 +107,8 @@ sub find_tag {
 }
 
 sub parse_tag {
-	my $tag = '';
+	my $tag        = '';
+	my $tag_open   = 0;
 
 	if      ($tag = getmatch('<!--')) {
 		$tag .= find_match('-->');
@@ -107,19 +118,25 @@ sub parse_tag {
 		$tag .= find_match(']]>');
 	} elsif ($tag = getmatch('</')) {
 		$tag .= find_match('>');
+
 		$tag =~ s/\s*>$/>/;
+
+		$level-- unless ($level == 0);
 	} else {
 		$tag .= find_match('>', 1);
-		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/\n   $1=$2/g;
+		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/"\n".($indent x $level)."   $1=$2"/eg;
 		if ($tag =~ m{/>$}) {
 			$tag =~ s{\s*/>$}{ />};
 		} else {
+			$tag_open = 1;
 			$tag =~ s{\s*>$}{>};
 		}
 	}
 
+	unless ($in_text) { $tag = ($indent x $level) . $tag . "\n"; }
 	print $tag;
-	unless ($in_text) { print "\n"; }
+
+	if ($tag_open) { $level++; }
 }
 
 while (nextchar()) {
