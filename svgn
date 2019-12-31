@@ -6,6 +6,8 @@ use autodie;
 
 my $match_string   = qr/'[^']*'|"[^"]*"/;
 
+my $in_text   = 0;
+
 {
 	my ($line, @chars);
 	my $idx    = 0;
@@ -75,9 +77,22 @@ my $match_string   = qr/'[^']*'|"[^"]*"/;
 }
 
 sub find_tag {
+	my $text = '';
 	while (nextchar() && !nextchar('<')) {
-		print getmatch(qr/[^<]*/);
+		$text .= getmatch(qr/[^<]*/);
 	}
+
+	unless ($in_text) {
+		if ($text =~ /\S/) {
+			$text =~ s/^\s*\n|\s+$//g; # Strip leading/trailing blank lines
+			$text =~ s/[[:blank:]]+$//mg;
+			$text .= "\n";
+		} else {
+			$text = '';
+		}
+	}
+
+	print $text;
 	return nextchar('<');
 }
 
@@ -104,6 +119,7 @@ sub parse_tag {
 	}
 
 	print $tag;
+	unless ($in_text) { print "\n"; }
 }
 
 while (nextchar()) {
