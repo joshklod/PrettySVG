@@ -109,8 +109,9 @@ sub find_tag {
 }
 
 sub parse_tag {
-	my $tag        = '';
-	my $tag_open   = 0;
+	my $tag             = '';
+	my $tag_open        = 0;
+	my $in_text_after   = $in_text;
 
 	if      ($tag = getmatch('<!--')) {
 		$tag .= find_match('-->');
@@ -124,6 +125,7 @@ sub parse_tag {
 		$tag =~ s/\s*>$/>/;
 
 		$level-- unless ($level == 0);
+		if ($tag =~ m{^</text\b}) { $in_text_after = 0; }
 	} else {
 		$tag .= find_match('>', 1);
 		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/"\n".($indent x $level)."$indent_attr$1=$2"/eg;
@@ -132,12 +134,15 @@ sub parse_tag {
 		} else {
 			$tag_open = 1;
 			$tag =~ s{\s*>$}{>};
+			if ($tag =~ /^<text\b/) { $in_text_after = 1; }
 		}
 	}
 
-	unless ($in_text) { $tag = ($indent x $level) . $tag . "\n"; }
-	print $tag;
+	unless ($in_text) { $tag = ($indent x $level) . $tag; }
+	$in_text = $in_text_after;
+	unless ($in_text) { $tag .= "\n"; }
 
+	print $tag;
 	if ($tag_open) { $level++; }
 }
 
