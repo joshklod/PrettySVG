@@ -7,8 +7,10 @@ use autodie;
 my $match_string   = qr/'[^']*'|"[^"]*"/;
 
 my $indent        = 2;
+my $indent_attr   = 3;
 
 if ($indent        =~ /^\d+$/) { $indent        = ' ' x $indent; }
+if ($indent_attr   =~ /^\d+$/) { $indent_attr   = ' ' x $indent_attr; }
 
 my $level     = 0;
 my $in_text   = 0;
@@ -124,7 +126,7 @@ sub parse_tag {
 		$level-- unless ($level == 0);
 	} else {
 		$tag .= find_match('>', 1);
-		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/"\n".($indent x $level)."   $1=$2"/eg;
+		$tag =~ s/\s+(\S+)\s*=\s*($match_string|\S*)/"\n".($indent x $level)."$indent_attr$1=$2"/eg;
 		if ($tag =~ m{/>$}) {
 			$tag =~ s{\s*/>$}{ />};
 		} else {
