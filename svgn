@@ -156,6 +156,9 @@ sub parse_tag {
 		while ($tag =~ s/\s+(\S*)\s*=\s*($match_string|\S*)//) {
 			push(@attrs, "$1=$2");
 		}
+		while ($tag =~ s/\s+(\S+)//) {
+			push(@attrs, $1);
+		}
 		@attrs = sort attr_sort @attrs;
 
 		$tag = join("\n".($indent x $level).$indent_attr,
