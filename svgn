@@ -150,8 +150,9 @@ sub parse_tag {
 	} else {
 		$tag .= find_match('>', 1);
 
-		$tag =~ s{\s*(/?>)$}{};
-		my $end = $1;
+		my $end = $tag =~ s{(/?>)$}{} ? $1 : '';
+
+		$tag =~ s/\s+$//;
 
 		while ($tag =~ s/\s+(\S*)\s*=\s*($match_string|\S*)//) {
 			push(@attrs, "$1=$2");
