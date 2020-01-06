@@ -165,7 +165,7 @@ sub parse_tag {
 		$tag = join("\n".($indent x $level).$indent_attr,
 				($tag, @attrs, $end));
 
-		if ($tag =~ m{/>$}) {
+		if ($end eq '/>') {
 			$tag =~ s{\s*/>$}{ />};
 		} else {
 			$tag_open = 1;
