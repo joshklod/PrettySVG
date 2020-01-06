@@ -8,6 +8,7 @@ my $match_string   = qr/'[^']*'|"[^"]*"/;
 
 my $indent        = 2;
 my $indent_attr   = 3;
+my $wrap_tag_end  = 0;
 
 if ($indent        =~ /^\d+$/) { $indent        = ' ' x $indent; }
 if ($indent_attr   =~ /^\d+$/) { $indent_attr   = ' ' x $indent_attr; }
@@ -166,10 +167,10 @@ sub parse_tag {
 		$tag = join($sep, ($tag, @attrs, $end));
 
 		if ($end eq '/>') {
-			$tag =~ s{\s*/>$}{ />};
+			if (!$wrap_tag_end && @attrs > 1) { $tag =~ s{\s*/>$}{ />}; }
 		} else {
 			$tag_open = 1;
-			$tag =~ s{\s*>$}{>};
+			unless ($wrap_tag_end && @attrs > 1) { $tag =~ s{\s*>$}{>}; }
 			if ($tag =~ /^<text\b/) { $in_text_after = 1; }
 		}
 	}
