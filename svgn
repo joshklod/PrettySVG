@@ -162,8 +162,8 @@ sub parse_tag {
 		}
 		@attrs = sort attr_sort @attrs;
 
-		$tag = join("\n".($indent x $level).$indent_attr,
-				($tag, @attrs, $end));
+		my $sep = (@attrs > 1) ? "\n".($indent x $level).$indent_attr : ' ';
+		$tag = join($sep, ($tag, @attrs, $end));
 
 		if ($end eq '/>') {
 			$tag =~ s{\s*/>$}{ />};
