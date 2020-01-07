@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 #
 # TODO:
+# - Metadata whitespace
 # - Handle multiline strings
 # - Split d/points/style strings logically
 
