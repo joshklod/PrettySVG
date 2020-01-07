@@ -53,7 +53,7 @@ my $in_text   = 0;
 		getline();
 
 		my ($match) = substr($line, $idx) =~ /^($regex)/;
-		if ($match) {
+		if (defined $match) {
 			$idx += length($match);
 		} else {
 			$match = '';
