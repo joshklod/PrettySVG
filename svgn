@@ -121,8 +121,11 @@ sub find_tag {
 			$text =~ s/[[:blank:]]+$//mg;
 
 			# Use indent of first line as reference
-			my ($old_indent) = $text =~ /^(\s*)/;
-			$text =~ s/^\Q$old_indent\E/$indent x $level/emg;
+			if ($text =~ /^(\s+)/) {
+				$text =~ s/^\Q$1\E/$indent x $level/emg;
+			} else {
+				$text = ($indent x $level) . $text;
+			}
 
 			$text .= "\n";
 		} else {
