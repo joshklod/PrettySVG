@@ -134,11 +134,8 @@ sub find_tag {
 	return nextchar('<');
 }
 
-sub parse_tag {
+sub get_tag {
 	my $tag             = '';
-	my $tag_open        = 0;
-	my $in_text_after   = $in_text;
-	my @attrs;
 
 	if      ($tag = getmatch('<!--')) {
 		$tag .= find_match('-->');
@@ -148,39 +145,62 @@ sub parse_tag {
 		$tag .= find_match(']]>');
 	} elsif ($tag = getmatch('</')) {
 		$tag .= find_match('>');
+	} else {
+		$tag .= find_match('>', 1);
+	}
 
+	return $tag;
+}
+
+sub format_tag {
+	my ($tag) = @_;
+	my @attrs;
+
+	my $end = $tag =~ s{(/?>)$}{} ? $1 : '';
+
+	$tag =~ s/\s+$//;
+
+	while ($tag =~ s/\s+(\S*)\s*=\s*($match_string|\S*)//) {
+		push(@attrs, "$1=$2");
+	}
+	while ($tag =~ s/\s+(\S+)//) {
+		push(@attrs, $1);
+	}
+	@attrs = sort attr_sort @attrs;
+
+	my $sep = (@attrs >= $wrap_attr_min) ?
+			"\n".($indent x $level).$indent_attr : ' ';
+	$tag = join($sep, ($tag, @attrs, $end));
+
+	if ($end eq '/>') {
+		if (!$wrap_tag_end && @attrs >= $wrap_attr_min) {
+			$tag =~ s{\s*/>$}{ />};
+		}
+	} else {
+		unless ($wrap_tag_end && @attrs >= $wrap_attr_min) {
+			$tag =~ s{\s*>$}{>};
+		}
+	}
+
+	return $tag;
+}
+
+sub process_tag {
+	my $tag_open        = 0;
+	my $in_text_after   = $in_text;
+
+	my $tag = get_tag();
+
+	if      ($tag =~ m{^</}) {
 		$tag =~ s/\s*>$/>/;
 
 		$level-- unless ($level == 0);
 		if ($tag =~ m{^</text\b}) { $in_text_after = 0; }
-	} else {
-		$tag .= find_match('>', 1);
+	} elsif ($tag =~ /^<[^!?]/) {
+		$tag = format_tag($tag);
 
-		my $end = $tag =~ s{(/?>)$}{} ? $1 : '';
-
-		$tag =~ s/\s+$//;
-
-		while ($tag =~ s/\s+(\S*)\s*=\s*($match_string|\S*)//) {
-			push(@attrs, "$1=$2");
-		}
-		while ($tag =~ s/\s+(\S+)//) {
-			push(@attrs, $1);
-		}
-		@attrs = sort attr_sort @attrs;
-
-		my $sep = (@attrs >= $wrap_attr_min) ?
-				"\n".($indent x $level).$indent_attr : ' ';
-		$tag = join($sep, ($tag, @attrs, $end));
-
-		if ($end eq '/>') {
-			if (!$wrap_tag_end && @attrs >= $wrap_attr_min) {
-				$tag =~ s{\s*/>$}{ />};
-			}
-		} else {
+		unless ($tag =~ m{/>$}) {
 			$tag_open = 1;
-			unless ($wrap_tag_end && @attrs >= $wrap_attr_min) {
-				$tag =~ s{\s*>$}{>};
-			}
 			if ($tag =~ /^<text\b/) { $in_text_after = 1; }
 		}
 	}
@@ -194,5 +214,5 @@ sub parse_tag {
 }
 
 while (nextchar()) {
-	find_tag() and parse_tag();
+	find_tag() and process_tag();
 }
