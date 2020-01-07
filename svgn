@@ -177,8 +177,7 @@ sub format_tag {
 	}
 	@attrs = sort attr_sort @attrs;
 
-	my $sep = (@attrs >= $wrap_attr_min) ?
-			"\n".($indent x $level).$indent_attr : ' ';
+	my $sep = (@attrs >= $wrap_attr_min) ? "\n".$indent_attr : ' ';
 	$tag = join($sep, ($tag, @attrs, $end));
 
 	if ($end eq '/>') {
@@ -209,6 +208,7 @@ sub process_tag {
 
 	if      ($type eq 'open' || $type eq 'empty') {
 		$tag = format_tag($tag);
+		$tag =~ s/\n/"\n".($indent x $level)/emg;
 	} elsif ($type eq 'close') {
 		$tag =~ s/\s*>$/>/;
 		$level-- unless ($level == 0);
