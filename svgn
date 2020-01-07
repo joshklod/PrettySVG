@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+#
+# TODO:
+# - Handle multiline strings
+# - Split d/points/style strings logically
 
 use strict;
 use warnings;
