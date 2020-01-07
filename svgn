@@ -88,7 +88,9 @@ my $in_text   = 0;
 sub attr_sort {
 	sub priority {
 		my ($attr) = @_;
-		my @order = ('id', qr/^xmlns(?:\:.*)?$/, 'x', 'y', 'width', 'height');
+		my @order = ('id', qr/^xmlns(?:\:.*)?$/, qr/^(?:xlink:)?href$/,
+				qr/^c?[xy]\d?$/, 'width', 'height', qr/^r[xy]?$/, 'transform',
+				'fill', 'stroke', 'opacity', 'style', 'd', 'points');
 
 		my ($name) = $attr =~ /^([^=]*)/;
 
