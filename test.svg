@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Here's a > comment "--><!--"-->
+<!-- Here's a > comment "-->text<!--"-->
 <svg
    version = "1.1"
-   width   = "400"
+   width   = 400
    height  = "400"
 
-   fake="very &lt;annoying> attr with     spaces	and symbols"
+   fake="very <annoying> attr with     spaces	and symbols"
    xmlns:svg="http://www.w3.org/2000/svg"
    xml:space="preserve"
+   random
+   inner text x
    id=	'root'    
    xmlns="http://www.w3.org/2000/svg"
 
@@ -36,7 +38,7 @@ Random
 
 text
 
-  <rect x="300" id="rect1"	width="50" fill="blue" height="50" y="150"/>
+  <rect x="300" id=rect1	width="50" fill=blue height="50" y="150"/>
 
   <g id='group1'>
   <text></text>
