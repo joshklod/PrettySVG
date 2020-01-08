@@ -189,31 +189,35 @@ sub format_tag {
 }
 
 sub process_tag {
-	my $tag_open        = 0;
-	my $in_text_after   = $in_text;
+	my $type;
 
 	my $tag = get_tag();
 
-	if      ($tag =~ m{^</}) {
-		$tag =~ s/\s*>$/>/;
+	if    ($tag =~ /^<[!?]/) { $type = 'misc'; }
+	elsif ($tag =~ m{^</})   { $type = 'close'; }
+	elsif ($tag =~ m{/>$})   { $type = 'empty'; }
+	else                     { $type = 'open'; }
 
-		$level-- unless ($level == 0);
-		if ($tag =~ m{^</text\b}) { $in_text_after = 0; }
-	} elsif ($tag =~ /^<[^!?]/) {
+	my $name = ($type eq 'misc') ? '' : lc (($tag =~ m{^</?([\w:\-.]*)})[0]);
+
+	if      ($type eq 'open' || $type eq 'empty') {
 		$tag = format_tag($tag);
-
-		unless ($tag =~ m{/>$}) {
-			$tag_open = 1;
-			if ($tag =~ /^<text\b/) { $in_text_after = 1; }
-		}
+	} elsif ($type eq 'close') {
+		$tag =~ s/\s*>$/>/;
+		$level-- unless ($level == 0);
 	}
 
 	unless ($in_text) { $tag = ($indent x $level) . $tag; }
-	$in_text = $in_text_after;
+
+	if ($name eq 'text') {
+		if    ($type eq 'open')  { $in_text = 1; }
+		elsif ($type eq 'close') { $in_text = 0; }
+	}
+
 	unless ($in_text) { $tag .= "\n"; }
 
 	print $tag;
-	if ($tag_open) { $level++; }
+	if ($type eq 'open') { $level++; }
 }
 
 while (nextchar()) {
