@@ -35,6 +35,12 @@ my $in_text   = 0;
 		}
 	}
 
+	sub column {
+		my $left = substr($line, 0, $idx);
+		$left =~ s/\t/        /g;
+		return length $left;
+	}
+
 	sub nextchar {
 		my ($c) = @_;
 
