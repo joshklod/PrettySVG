@@ -117,15 +117,16 @@ sub find_tag {
 
 	unless ($in_text) {
 		if ($text =~ /\S/) {
-			$text =~ s/^\s*\n|\s+$//g; # Strip leading/trailing blank lines
-			$text =~ s/[[:blank:]]+$//mg;
-
-			# Use indent of first line as reference
-			if ($text =~ /^(\s+)/) {
+			if ($text =~ s/^\s*\n//) {
+				# Use indent of first line as reference
+				$text =~ /^(\s*)/;
 				$text =~ s/^\Q$1\E/$indent x $level/emg;
 			} else {
 				$text = ($indent x $level) . $text;
 			}
+
+			$text =~ s/\s+$//;
+			$text =~ s/[[:blank:]]+$//mg;
 
 			$text .= "\n";
 		} else {
